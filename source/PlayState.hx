@@ -81,7 +81,6 @@ class PlayState extends MusicBeatState
 	public static var sicks:Int = 0;
 	public static var mania:Int = 0;
 	public static var keyAmmo:Array<Int> = [4, 6, 9];
-	//public static var dataJump:Array<Int> = [8, 12, 18];
 
 	public static var songPosBG:FlxSprite;
 	public static var songPosBar:FlxBar;
@@ -120,9 +119,9 @@ class PlayState extends MusicBeatState
 
 	private static var prevCamFollow:FlxObject;
 
-	public static var strumLineNotes:FlxTypedGroup<FlxSprite> = null;
-	public static var playerStrums:FlxTypedGroup<FlxSprite> = null;
-	public static var cpuStrums:FlxTypedGroup<FlxSprite> = null;
+	public static var strumLineNotes:FlxTypedGroup<StrumNote> = null;
+	public static var playerStrums:FlxTypedGroup<StrumNote> = null;
+	public static var cpuStrums:FlxTypedGroup<StrumNote> = null;
 
 	private var camZooming:Bool = false;
 	private var curSong:String = "";
@@ -856,11 +855,11 @@ class PlayState extends MusicBeatState
 		if (FlxG.save.data.downscroll)
 			strumLine.y = FlxG.height - 165;
 
-		strumLineNotes = new FlxTypedGroup<FlxSprite>();
+		strumLineNotes = new FlxTypedGroup<StrumNote>();
 		add(strumLineNotes);
 
-		playerStrums = new FlxTypedGroup<FlxSprite>();
-		cpuStrums = new FlxTypedGroup<FlxSprite>();
+		playerStrums = new FlxTypedGroup<StrumNote>();
+		cpuStrums = new FlxTypedGroup<StrumNote>();
 
 		// startCountdown();
 
@@ -1463,7 +1462,7 @@ class PlayState extends MusicBeatState
 		for (i in 0...keyAmmo[mania])
 		{
 			// FlxG.log.add(i);
-			var babyArrow:FlxSprite = new FlxSprite(0, strumLine.y);
+			var babyArrow:StrumNote = new StrumNote(0, strumLine.y, i);
 
 			switch (SONG.noteStyle)
 			{
@@ -1576,10 +1575,10 @@ class PlayState extends MusicBeatState
 			babyArrow.x += 50;
 			babyArrow.x += ((FlxG.width / 2) * player);
 			
-			cpuStrums.forEach(function(spr:FlxSprite)
+			/*cpuStrums.forEach(function(spr:FlxSprite)
 			{					
 				spr.centerOffsets(); //CPU arrows start out slightly off-center
-			});
+			});*/
 
 			strumLineNotes.add(babyArrow);
 		}
@@ -1716,7 +1715,7 @@ class PlayState extends MusicBeatState
 			var p1 = luaModchart.getVar("strumLine1Visible",'bool');
 			var p2 = luaModchart.getVar("strumLine2Visible",'bool');
 
-			for (i in 0...4)
+			for (i in 0...keyAmmo[mania])
 			{
 				strumLineNotes.members[i].visible = p1;
 				if (i <= playerStrums.length)
@@ -2321,20 +2320,20 @@ class PlayState extends MusicBeatState
 						
 						if (FlxG.save.data.cpuStrums)
 						{
-							cpuStrums.forEach(function(spr:FlxSprite)
+							cpuStrums.forEach(function(spr:StrumNote)
 							{
 								if (Math.abs(daNote.noteData) == spr.ID)
 								{
-									spr.animation.play('confirm', true);
+									spr.playAnim('confirm', true);
 								}
-								if (spr.animation.curAnim.name == 'confirm' && !curStage.startsWith('school'))
+								/*if (spr.animation.curAnim.name == 'confirm' && !curStage.startsWith('school'))
 								{
 									spr.centerOffsets();
 									spr.offset.x -= 13;
 									spr.offset.y -= 13;
 								}
 								else
-									spr.centerOffsets();
+									spr.centerOffsets();*/
 							});
 						}
 	
@@ -3100,21 +3099,21 @@ class PlayState extends MusicBeatState
 						boyfriend.playAnim('idle');
 				}
 		 
-				playerStrums.forEach(function(spr:FlxSprite)
+				playerStrums.forEach(function(spr:StrumNote)
 				{
 					if (pressArray[spr.ID] && spr.animation.curAnim.name != 'confirm')
-						spr.animation.play('pressed');
+						spr.playAnim('pressed');
 					if (!holdArray[spr.ID])
-						spr.animation.play('static');
+						spr.playAnim('static');
 		 
-					if (spr.animation.curAnim.name == 'confirm' && !curStage.startsWith('school'))
+					/*if (spr.animation.curAnim.name == 'confirm' && !curStage.startsWith('school'))
 					{
 						spr.centerOffsets();
 						spr.offset.x -= 13;
 						spr.offset.y -= 13;
 					}
 					else
-						spr.centerOffsets();
+						spr.centerOffsets();*/
 				});
 			}
 
@@ -3328,11 +3327,11 @@ class PlayState extends MusicBeatState
 					if(!loadRep && note.mustPress)
 						saveNotes.push(HelperFunctions.truncateFloat(note.strumTime, 2));
 					
-					playerStrums.forEach(function(spr:FlxSprite)
+					playerStrums.forEach(function(spr:StrumNote)
 					{
 						if (Math.abs(note.noteData) == spr.ID)
 						{
-							spr.animation.play('confirm', true);
+							spr.playAnim('confirm', true);
 						}
 					});
 					
